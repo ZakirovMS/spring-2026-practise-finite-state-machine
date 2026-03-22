@@ -77,8 +77,47 @@ private:
 
 public:
   FSM(const char* alphabet, const State* states, int statesCount,
-    const char* startState, const char** finiteStates, int finiteStatesCount);
-  bool test(const char* value);
+    const char* startState, const char** finiteStates, int finiteStatesCount)
+  {
+    this->alphabet = alphabet;
+    this->states = states;
+    this->statesCount = statesCount;
+    this->startState = startState;
+    this->finiteStatesNames = finiteStates;
+    this->finiteStatesCount = finiteStatesCount;
+    this->currentState = nullptr;
+
+    if (findState(startState) == nullptr)
+    {
+      throw std::runtime_error("Start state not found in states list");
+    }
+  }
+
+  bool test(const char* value)
+  {
+    currentState = startState;
+    const State* currentStateObj = findState(currentState);
+
+    for (size_t i = 0; value[i] != '\0'; ++i)
+    {
+      char symbol = value[i];
+
+      if (!isSymbolInAlphabet(symbol))
+      {
+        return false;
+      }
+
+      const char* nextState = findNextState(currentStateObj, symbol);
+      if (nextState == nullptr)
+      {
+        return false; 
+      }
+
+      currentState = nextState;
+      currentStateObj = findState(currentState);
+    }
+    return isFiniteState(currentState);
+  }
 };
 
 int main()
