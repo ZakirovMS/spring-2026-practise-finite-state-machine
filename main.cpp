@@ -141,7 +141,7 @@ int main()
     {"q0", q0_Transitions, 2},
     {"q1", q1_Transitions, 2}
   };
-  
+
   int statesCount = 2;
 
   const char* startState = "q0";
@@ -149,5 +149,25 @@ int main()
   const char* finiteStates[] = {"q0", "q1"};
   int finiteStatesCount = 2;
 
+  FSM binaryFSM(alphabet, states, statesCount, startState, finiteStates, finiteStatesCount);
+
+  const char* testCases[] =
+  {
+    "010100000f1",
+    "111000",
+    "0",
+    "",
+    "10201f",
+    "abc",
+    "10a1"
+  };
+  std::cout << "Проверка строк на бинарность " << '\n';
+
+  for (int i = 0; i < 7; ++i)
+  {
+    bool result = binaryFSM.test(testCases[i]);
+    std::cout << "\"" << testCases[i] << "\" -> " << (result ? "Принято" : "Отклонено") << '\n';
+  }
+  
   return 0;
 }
