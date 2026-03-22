@@ -122,6 +122,32 @@ public:
 
 int main()
 {
+  const char* alphabet = "01";
+
+  Transition q0_Transitions[] =
+  {
+    {'0', "q0"},
+    {'1', "q1"}
+  };
+
+  Transition q1_Transitions[] =
+  {
+    {'0', "q0"},
+    {'1', "q1"}
+  };
+
+  State states[] =
+  {
+    {"q0", q0_Transitions, 2},
+    {"q1", q1_Transitions, 2}
+  };
+  
+  int statesCount = 2;
+
+  const char* startState = "q0";
+
+  const char* finiteStates[] = {"q0", "q1"};
+  int finiteStatesCount = 2;
 
   return 0;
 }
