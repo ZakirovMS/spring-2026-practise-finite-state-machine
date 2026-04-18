@@ -190,3 +190,28 @@ Transition FSM::getTransition(State curr, InputType inp) const
     return {State::Error, Action::Set_error, "Unknown state"};
   }
 }
+
+void FSM::applyAction(const Transition& tr, char c, size_t i)
+{
+  switch (tr.action)
+  {
+  case Action::Push:
+    output_tokens_.emplace_back(tr.token.empty() ? std::string(1, c) : tr.token, i);
+    break;
+  case Action::Push_marker:
+    output_tokens_.emplace_back(tr.token, i);
+    break;
+  case Action::Continue:
+    if (number_buffer_.empty())
+    {
+      number_buffer_start_ = i;
+    }
+    number_buffer_ += c;
+    break;
+  case Action::Skip:
+    break;
+  case Action::Set_error:
+    last_error_pos_ = i;
+    break;
+  }
+}
