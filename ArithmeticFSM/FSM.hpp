@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <cstddef>
 
 enum class State
 {
@@ -44,6 +45,33 @@ struct Transition
   State nextstate;
   Action action;
   std::string token;
+};
+
+class FSM
+{
+public:
+  struct ValidationResult
+  {
+    bool success;
+    std::vector< std::pair< std::string, size_t > > tokens;
+    size_t error_ind;
+    std::string error_msg;
+  };
+
+  ValidationResult analyze(const std::string& input);
+
+private:
+  State curr_state_ = State::Start;
+  std::vector< std::pair< std::string, size_t > > output_tokens_;
+  std::string number_buffer_;
+  size_t number_buffer_start_ = 0;
+  std::vector< size_t > open_bracket_pos_;
+  size_t last_error_pos_ = 0;
+
+  InputType classify(char c, const std::string& input, size_t i) const;
+  Transition getTransition(State curr, InputType inp) const;
+  void applyAction(const Transition& tr, char c, size_t i);
+  bool finalize();
 };
 
 #endif
