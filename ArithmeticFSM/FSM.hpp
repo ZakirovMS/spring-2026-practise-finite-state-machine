@@ -39,4 +39,11 @@ enum class Action
   Continue
 };
 
+struct Transition
+{
+  State nextstate;
+  Action action;
+  std::string token;
+};
+
 #endif
