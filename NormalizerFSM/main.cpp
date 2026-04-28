@@ -1,4 +1,5 @@
 #include <iostream>
+#include "fsm.hpp"
 
 int main()
 {
