@@ -1,5 +1,6 @@
 #include <iostream>
 #include "fsm.hpp"
+#include "postfix.hpp"
 
 int main()
 {
