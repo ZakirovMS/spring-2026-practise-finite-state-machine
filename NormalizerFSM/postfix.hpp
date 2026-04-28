@@ -25,7 +25,7 @@ long long negate(long long a);
 long long logarithm(long long a);
 
 long long computeBinary(long long a, long long b, const std::string& op);
-long long computeUnary(long long a, const std::string& op)
+long long computeUnary(long long a, const std::string& op);
 
 long long evaluatePostfix(const std::queue< std::pair< std::string, size_t > >& tokens);
 

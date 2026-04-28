@@ -264,6 +264,63 @@ long long evaluatePostfix(const std::queue< std::pair< std::string, size_t > >& 
   return stk.top();
 }
 
-std::queue< std::pair< std::string, size_t > > convertToPostfix(const std::vector< std::pair< std::string, size_t > >& tokens);
+std::queue< std::pair< std::string, size_t > > convertToPostfix(const std::vector< std::pair< std::string, size_t > >& tokens)
+{
+  std::stack< std::pair< std::string, size_t > > stk;
+  std::queue< std::pair< std::string, size_t > > output;
+
+  for (size_t i = 0; i < tokens.size(); ++i)
+  {
+    const std::string& val = tokens[i].first;
+    if (std::isdigit(static_cast< unsigned char >(val[0])))
+    {
+      output.push(tokens[i]);
+    }
+    else if (val == "(")
+    {
+      stk.push(tokens[i]);
+    }
+    else if (val == ")")
+    {
+      while (!stk.empty() && stk.top().first != "(")
+      {
+        output.push(stk.top());
+        stk.pop();
+      }
+      if (!stk.empty())
+      {
+        stk.pop();
+      }
+    }
+    else
+    {
+      size_t p1 = getPriority(val);
+
+      while (!stk.empty() && stk.top().first != "(")
+      {
+        size_t p2 = getPriority(stk.top().first);
+        
+        if ((p2 > p1) || (p2 == p1 && !isRightAssociative(val)))
+        {
+          output.push(stk.top());
+          stk.pop();
+        }
+        else
+        {
+          break;
+        }
+      }
+      stk.push(tokens[i]);
+    }
+  }
+
+  while (!stk.empty())
+  {
+    output.push(stk.top());
+    stk.pop();
+  }
+
+  return output;
+}
 
 #endif
