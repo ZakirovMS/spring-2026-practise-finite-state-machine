@@ -162,9 +162,51 @@ long long logarithm(long long a)
   return static_cast< long long >(std::log(static_cast< double >(a)));
 }
 
-long long computeBinary(long long a, long long b, const std::string& op);
+long long computeBinary(long long a, long long b, const std::string& op)
+{
+  if (op == "+")
+  {
+    return sum(a, b);
+  }
+  else if (op == "-")
+  {
+    return subtract(a, b);
+  }
+  else if (op == "*")
+  {
+    return multiply(a, b);
+  }
+  else if (op == "/")
+  {
+    return divide(a, b);
+  }
+  else if (op == "%")
+  {
+    return mod(a, b);
+  }
+  else if (op == "|")
+  {
+    return concatenate(a, b);
+  }
+  else if (op == "^")
+  {
+    return power(a, b);
+  }
+  throw std::invalid_argument("Unknown binary operator");
+}
 
-long long computeUnary(long long a, const std::string& op);
+long long computeUnary(long long a, const std::string& op)
+{
+  if (op == "~")
+  {
+    return negate(a);
+  }
+  else if (op == "ln")
+  {
+    return logarithm(a);
+  }
+  throw std::invalid_argument("Unknown unary operator");
+}
 
 long long evaluatePostfix(const std::queue< std::pair< std::string, size_t > >& tokens);
 
