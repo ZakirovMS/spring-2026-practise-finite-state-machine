@@ -116,13 +116,51 @@ long long mod(long long a, long long b)
   }
 }
 
-long long power(long long base, long long exp);
+long long power(long long base, long long exp)
+{
+  if (exp < 0)
+  {
+    throw std::invalid_argument("Negative exponent in integer context");
+  }
+  long long res = 1;
+  for (long long i = 0; i < exp; ++i)
+  {
+    res = multiply(res, base);
+  }
+  return res;
+}
 
-long long concatenate(long long a, long long b);
+long long concatenate(long long a, long long b)
+{
+  std::string combo = std::to_string(a) + std::to_string(b);
 
-long long negate(long long a);
+  try
+  {
+    return std::stoll(combo);
+  }
+  catch(const std::out_of_range&)
+  {
+    throw std::overflow_error("Concatenation overflow");
+  }
+}
 
-long long logarithm(long long a);
+long long negate(long long a)
+{
+  if (a == MIN)
+  {
+    throw std::overflow_error("Negation overflow");
+  }
+  return -a;
+}
+
+long long logarithm(long long a)
+{
+  if (a <= 0)
+  {
+    throw std::invalid_argument("Natural log of not positive number");
+  }
+  return static_cast< long long >(std::log(static_cast< double >(a)));
+}
 
 long long computeBinary(long long a, long long b, const std::string& op);
 
