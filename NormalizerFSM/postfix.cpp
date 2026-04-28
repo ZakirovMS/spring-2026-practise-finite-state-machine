@@ -32,15 +32,89 @@ bool isRightAssociative(const std::string& op)
   return (op == "~" ||  op == "ln" || op == "^");
 }
 
-long long sum(long long a, long long b);
+long long sum(long long a, long long b)
+{
+  if (b > 0 && a > MAX - b)
+  {
+    throw std::overflow_error("Sum overflow");
+  }
+  else if (b < 0 && a < MIN - b)
+  {
+    throw std::overflow_error("Sum underflow");
+  }
+  return a + b;
+}
 
-long long subtract(long long a, long long b);
+long long subtract(long long a, long long b)
+{
+  if (b > 0 && a < MIN + b)
+  {
+    throw std::overflow_error("Subtract underflow");
+  }
+  else if (b < 0 && a > MAX + b)
+  {
+    throw std::overflow_error("Subtract overflow");
+  }
+  return a - b;
+}
 
-long long multiply(long long a, long long b);
+long long multiply(long long a, long long b)
+{
+  if (a == 0 || b == 0)
+  {
+    return 0;
+  }
 
-long long divide(long long a, long long b);
+  if (a > 0)
+  {
+    if (b > 0 && a > MAX / b)
+    {
+      throw std::overflow_error("Mult overflow");
+    }
+    else if (b < 0 && b < MIN / a)
+    {
+      throw std::overflow_error("Mult underflow");
+    }
+  }
+  else
+  {
+    if (b > 0 && a < MIN / b)
+    {
+      throw std::overflow_error("Mult underflow");
+    }
+    else if (b < 0 && a < MAX / b)
+    {
+      throw std::overflow_error("Mult overflow");
+    }
+  }
+  return a * b;
+}
 
-long long mod(long long a, long long b);
+long long divide(long long a, long long b)
+{
+  if (b == 0)
+  {
+    throw std::runtime_error("Division by zero");
+  }
+
+  if (a == MIN && b == -1)
+  {
+    throw std::overflow_error("Division overflow");
+  }
+  return a / b;
+}
+
+long long mod(long long a, long long b)
+{
+  if (b == 0)
+  {
+    throw std::runtime_error("Division by zero");
+  }
+  else
+  {
+    return (a % b + b) % b;
+  }
+}
 
 long long power(long long base, long long exp);
 
