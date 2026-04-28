@@ -193,9 +193,46 @@ Transition FSM::getTransition(State curr, InputType inp) const
   }
 }
 
-void FSM::applyAction(const Transition& tr, char c, size_t i);
+void FSM::applyAction(const Transition& tr, char c, size_t i)
+{
+  switch (tr.action)
+  {
+  case Action::Push:
+    output_tokens_.emplace_back(tr.token.empty() ? std::string(1, c) : tr.token, i);
+    break;
+  case Action::Push_marker:
+    output_tokens_.emplace_back(tr.token, i);
+    break;
+  case Action::Continue:
+    if (number_buffer_.empty())
+    {
+      number_buffer_start_ = i;
+    }
+    number_buffer_ += c;
+    break;
+  case Action::Skip:
+    break;
+  case Action::Set_error:
+    last_error_pos_ = i;
+    break;
+  }
+}
 
-bool FSM::finalize();
+bool FSM::finalize()
+{
+  if (!number_buffer_.empty())
+  {
+    output_tokens_.emplace_back(number_buffer_, number_buffer_start_);
+    number_buffer_.clear();
+  }
+
+  if (curr_state_ == State::Operator || curr_state_ == State::Unary_minus || curr_state_ == State::Open_bracket)
+  {
+    return false;
+  }
+
+  return true;
+}
 
 FSM::ValidationResult FSM::analyze(const std::string& input);
 
