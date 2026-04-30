@@ -234,4 +234,80 @@ bool FSM::finalize()
   return true;
 }
 
+FSM::ValidationResult FSM::analyze(const std::string& input)
+{
+  curr_state_ = State::Start;
+  output_tokens_.clear();
+  number_buffer_.clear();
+  number_buffer_start_ = 0;
+  open_bracket_pos_.clear();
+  last_error_pos_ = 0;
+
+  bool has_content = false;
+  for (char ch : input)
+  {
+    if (!std::isspace(static_cast< unsigned char >(ch)))
+    {
+      has_content = true;
+      break;
+    }
+  }
+  if (!has_content)
+  {
+    return ValidationResult{false, {}, 0, "Empty expression"};
+  }
+
+  for (size_t i = 0; i <= input.size(); ++i)
+  {
+    char c = (i < input.size()) ? input[i] : '\0';
+    InputType inp = classify(c, input, i);
+    Transition tr = getTransition(curr_state_, inp);
+
+    if (curr_state_ == State::Number && tr.nextstate != State::Number && !number_buffer_.empty())
+    {
+      output_tokens_.emplace_back(number_buffer_, number_buffer_start_);
+      number_buffer_.clear();
+    }
+
+    applyAction(tr, c, i);
+
+    if (tr.action == Action::Set_error)
+    {
+      size_t pos = last_error_pos_;
+      if (inp == InputType::End && i > 0)
+      {
+        pos = i - 1;
+      }
+      return ValidationResult{false, {}, pos, tr.token};
+    }
+
+    if (c == '(')
+    {
+      open_bracket_pos_.push_back(i);
+    }
+    else if (c == ')')
+    {
+      if (open_bracket_pos_.empty())
+      {
+        return ValidationResult{false, {}, i, "Unexpected closing bracket"};
+      }
+      open_bracket_pos_.pop_back();
+    }
+
+    curr_state_ = tr.nextstate;
+  }
+
+  if (finalize() && open_bracket_pos_.empty())
+  {
+    return ValidationResult{true, std::move(output_tokens_), 0, ""};
+  }
+
+  if (!open_bracket_pos_.empty())
+  {
+    return ValidationResult{false, {}, open_bracket_pos_.front(), "Mismatched parentheses"};
+  }
+
+  return ValidationResult{false, {}, last_error_pos_ != 0 ? last_error_pos_ : input.size(), "Incomplete expression"};
+}
+
 #endif
