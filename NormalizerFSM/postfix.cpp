@@ -208,4 +208,60 @@ long long computeUnary(long long a, const std::string& op)
   throw std::invalid_argument("Unknown unary operator");
 }
 
+long long evaluatePostfix(const std::queue< std::pair< std::string, size_t > >& tokens)
+{
+  std::stack< long long > stk;
+  std::queue< std::pair< std::string, size_t > > queue = tokens;
+
+  while (!queue.empty())
+  {
+    auto token = queue.front();
+    queue.pop();
+
+    if (std::isdigit(static_cast< unsigned char >(token.first[0])))
+    {
+      stk.push(std::stoll(token.first));
+    }
+    else
+    {
+      try
+      {
+        if (token.first == "~" || token.first == "ln")
+        {
+          if (stk.empty())
+          {
+            throw std::runtime_error("Stack underflow on unary operator");
+          }
+          long long a = stk.top();
+          stk.pop();
+          stk.push(computeUnary(a, token.first));
+        }
+        else
+        {
+          if (stk.size() < 2)
+          {
+            throw std::runtime_error("Stack underflow on binary operator");
+          }
+          long long b = stk.top();
+          stk.pop();
+          long long a = stk.top();
+          stk.pop();
+          stk.push(computeBinary(a, b, token.first));
+        }
+      }
+      catch (const std::exception& e)
+      {
+        std::string msg = "at pos " + std::to_string(token.second) + " " + e.what();
+        throw std::runtime_error(msg);
+      }
+    }
+  }
+
+  if (stk.size() != 1)
+  {
+    throw std::runtime_error("Invalid expression structure");
+  }
+  return stk.top();
+}
+
 #endif
